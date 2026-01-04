@@ -1,0 +1,9 @@
+#!/usr/bin/env sh
+. "$(dirname "$0")/_/husky.sh"
+
+# Run commitlint if available; otherwise skip to avoid blocking commits
+if npx --no-install commitlint --version >/dev/null 2>&1; then
+  npx --no-install commitlint --edit "$1"
+else
+  exit 0
+fi
