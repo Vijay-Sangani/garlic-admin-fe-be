@@ -6,8 +6,6 @@ const nextConfig: NextConfig = {
   images: {
     domains: [],
   },
-
-  output: "standalone",
 };
 
 export default nextConfig;
