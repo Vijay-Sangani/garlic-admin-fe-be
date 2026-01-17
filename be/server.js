@@ -3,27 +3,23 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 require("dotenv").config();
 
+const authRoutes = require("./routes/auth");
+const customerRoutes = require("./routes/customers");
+const dailyEntryRoutes = require("./routes/dailyEntries");
+const paymentRoutes = require("./routes/payments");
+
 const app = express();
 app.use(cors());
 app.use(express.json());
 
 mongoose
   .connect(process.env.MONGO_URI)
-  .then(() => {
-    console.log("Connected to MongoDB");
-  })
-  .catch((err) => {
-    console.error("MongoDB connection error:", err);
-  });
+  .then(() => console.log("MongoDB Connected"))
+  .catch(console.error);
 
-mongoose.connection.on("error", (err) => {
-  console.error("MongoDB connection error:", err);
-});
+app.use("/api/auth", authRoutes);
+app.use("/api/customers", customerRoutes);
+app.use("/api/daily-entries", dailyEntryRoutes);
+app.use("/api/payments", paymentRoutes);
 
-mongoose.connection.on("disconnected", () => {
-  console.log("MongoDB disconnected");
-});
-
-app.get("/", (req, res) => res.send("API Running"));
-
-app.listen(5000, () => console.log("Server started"));
+app.listen(5000, () => console.log("Server running on port 5000"));

@@ -1,9 +1,11 @@
 "use client";
 
+import { LayoutDashboard, Users, ClipboardList, Calendar, CreditCard, Sprout } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { JSX } from "react";
+
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, Users, ClipboardList, Calendar, CreditCard, Sprout } from "lucide-react";
 
 const menuItems = [
   {
@@ -33,7 +35,7 @@ const menuItems = [
   },
 ];
 
-export function Sidebar() {
+const Sidebar = (): JSX.Element => {
   const pathname = usePathname();
 
   return (
@@ -50,14 +52,14 @@ export function Sidebar() {
           const isActive = pathname === item.href;
           return (
             <Link
-              key={item.href}
-              href={item.href}
               className={cn(
                 "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                 isActive
                   ? "bg-sidebar-accent text-sidebar-accent-foreground"
                   : "text-sidebar-foreground hover:bg-sidebar-accent/50"
               )}
+              href={item.href}
+              key={item.href}
             >
               <item.icon className="h-5 w-5" />
               {item.title}
@@ -70,4 +72,6 @@ export function Sidebar() {
       </div>
     </div>
   );
-}
+};
+
+export default Sidebar;
