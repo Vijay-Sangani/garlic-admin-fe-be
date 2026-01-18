@@ -2,6 +2,11 @@ const mongoose = require("mongoose");
 
 const DailyEntrySchema = new mongoose.Schema(
   {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
     date: {
       type: String, // stored as YYYY-MM-DD
       required: true,
@@ -28,7 +33,7 @@ const DailyEntrySchema = new mongoose.Schema(
       min: 0,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 module.exports = mongoose.model("DailyEntry", DailyEntrySchema);

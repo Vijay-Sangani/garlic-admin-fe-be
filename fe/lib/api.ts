@@ -5,6 +5,15 @@ function getApiBaseUrl(): string {
   return process.env.NEXT_PUBLIC_API_BASE_URL || DEFAULT_API_BASE_URL;
 }
 
+function getToken(): string | null {
+  // Get token from localStorage (set during login)
+  if (typeof window !== "undefined") {
+    // Try both key names for compatibility
+    return localStorage.getItem("token") || localStorage.getItem("authToken");
+  }
+  return null;
+}
+
 export class ApiError extends Error {
   status: number;
   body: unknown;
@@ -26,6 +35,12 @@ export async function apiFetch<T>(
   const headers = new Headers(init?.headers);
   if (init?.json !== undefined) {
     headers.set("Content-Type", "application/json");
+  }
+
+  // Add authorization token if available
+  const token = getToken();
+  if (token) {
+    headers.set("Authorization", `Bearer ${token}`);
   }
 
   const res = await fetch(url, {

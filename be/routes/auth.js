@@ -56,8 +56,8 @@ router.post("/signup", async (req, res) => {
     // Generate token
     const token = jwt.sign(
       { userId: newUser._id, email: newUser.email },
-      process.env.JWT_SECRET || "your-secret-key",
-      { expiresIn: "7d" }
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" },
     );
 
     res.status(201).json({
@@ -107,8 +107,8 @@ router.post("/login", async (req, res) => {
     // Generate JWT token
     const token = jwt.sign(
       { userId: user._id, email: user.email, role: user.role },
-      process.env.JWT_SECRET || "your-secret-key",
-      { expiresIn: "7d" }
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" },
     );
 
     res.json({
@@ -172,7 +172,7 @@ router.post("/forgot-password", async (req, res) => {
     } catch (emailError) {
       console.log(
         "Email service unavailable, but token generated:",
-        resetToken
+        resetToken,
       );
     }
 
@@ -246,7 +246,7 @@ router.get("/verify-token", (req, res) => {
 
     const decoded = jwt.verify(
       token,
-      process.env.JWT_SECRET || "your-secret-key"
+      process.env.JWT_SECRET || "your-secret-key",
     );
     res.json({ valid: true, user: decoded });
   } catch (error) {
@@ -268,7 +268,7 @@ router.post("/change-password", async (req, res) => {
     // Verify token and get user
     const decoded = jwt.verify(
       token,
-      process.env.JWT_SECRET || "your-secret-key"
+      process.env.JWT_SECRET || "your-secret-key",
     );
 
     const { newPassword } = req.body;

@@ -10,6 +10,11 @@ const EntrySchema = new mongoose.Schema({
 
 const CustomerSchema = new mongoose.Schema(
   {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
     name: {
       type: String,
       required: true,
@@ -34,7 +39,7 @@ const CustomerSchema = new mongoose.Schema(
   {
     timestamps: true,
     strict: true, // 🔒 VERY IMPORTANT (ROOT FIX)
-  }
+  },
 );
 
 module.exports = mongoose.model("Customer", CustomerSchema);

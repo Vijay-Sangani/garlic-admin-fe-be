@@ -2,13 +2,17 @@ const express = require("express");
 const router = express.Router();
 const Payment = require("../models/Payment");
 const DailyEntry = require("../models/DailyEntry");
+const authenticateToken = require("../middleware/auth");
+
+// Apply authentication to all routes
+router.use(authenticateToken);
 
 /**
  * GET all payments (sorted by date descending)
  */
 router.get("/", async (req, res) => {
   try {
-    const payments = await Payment.find()
+    const payments = await Payment.find({ userId: req.user.userId })
       .populate("customerId", "name mobile address")
       .sort({ date: -1 });
 
@@ -31,6 +35,7 @@ router.get("/by-date/:date", async (req, res) => {
     endDate.setHours(23, 59, 59, 999);
 
     const payments = await Payment.find({
+      userId: req.user.userId,
       date: { $gte: startDate, $lte: endDate },
     })
       .populate("customerId", "name mobile address")
@@ -57,6 +62,7 @@ router.get("/outstanding/:customerId", async (req, res) => {
 
     // Get total revenue (sold amount) for this customer in current month
     const entries = await DailyEntry.find({
+      userId: req.user.userId,
       customer: customerId,
       date: {
         $gte: currentMonthStart.toISOString().split("T")[0],
@@ -66,7 +72,7 @@ router.get("/outstanding/:customerId", async (req, res) => {
 
     const totalRevenue = entries.reduce(
       (sum, entry) => sum + (entry.totalAmount || 0),
-      0
+      0,
     );
 
     // Get total payments received for this customer in current month
@@ -80,7 +86,7 @@ router.get("/outstanding/:customerId", async (req, res) => {
 
     const totalPaid = payments.reduce(
       (sum, payment) => sum + payment.amount,
-      0
+      0,
     );
 
     // Outstanding = Total Revenue - Total Paid
@@ -104,6 +110,7 @@ router.get("/summary/pending-total", async (req, res) => {
 
     // Get all entries for current month
     const entries = await DailyEntry.find({
+      userId: req.user.userId,
       date: {
         $gte: currentMonthStart.toISOString().split("T")[0],
         $lte: currentMonthEnd.toISOString().split("T")[0],
@@ -112,11 +119,12 @@ router.get("/summary/pending-total", async (req, res) => {
 
     const totalRevenue = entries.reduce(
       (sum, entry) => sum + (entry.totalAmount || 0),
-      0
+      0,
     );
 
     // Get all payments for current month
     const payments = await Payment.find({
+      userId: req.user.userId,
       date: {
         $gte: currentMonthStart,
         $lte: currentMonthEnd,
@@ -125,7 +133,7 @@ router.get("/summary/pending-total", async (req, res) => {
 
     const totalPaid = payments.reduce(
       (sum, payment) => sum + payment.amount,
-      0
+      0,
     );
 
     // Pending = Total Revenue - Total Paid
@@ -158,6 +166,7 @@ router.post("/", async (req, res) => {
     }
 
     const newPayment = new Payment({
+      userId: req.user.userId,
       customerId,
       amount: parseFloat(amount),
       mode: mode.toLowerCase(),
@@ -168,7 +177,7 @@ router.post("/", async (req, res) => {
     const savedPayment = await newPayment.save();
     const populatedPayment = await savedPayment.populate(
       "customerId",
-      "name mobile address"
+      "name mobile address",
     );
 
     res.status(201).json(populatedPayment);
@@ -194,7 +203,7 @@ router.put("/:id", async (req, res) => {
         date: new Date(date),
         notes: notes || null,
       },
-      { new: true }
+      { new: true },
     ).populate("customerId", "name mobile address");
 
     if (!updatedPayment) {

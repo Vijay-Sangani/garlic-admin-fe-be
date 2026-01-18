@@ -1,14 +1,21 @@
 const express = require("express");
 const DailyEntry = require("../models/DailyEntry");
+const authenticateToken = require("../middleware/auth");
 
 const router = express.Router();
+
+// Apply authentication to all routes
+router.use(authenticateToken);
 
 /**
  * GET all entries - Simple endpoint to view all data
  */
 router.get("/all", async (req, res) => {
   try {
-    const entries = await DailyEntry.find().populate("customer", "name");
+    const entries = await DailyEntry.find({ userId: req.user.userId }).populate(
+      "customer",
+      "name",
+    );
 
     const mappedEntries = entries.map((e) => ({
       id: e._id,
@@ -34,9 +41,9 @@ router.get("/", async (req, res) => {
   try {
     const { date } = req.query;
 
-    let query = {};
+    let query = { userId: req.user.userId };
     if (date) {
-      query = { date: date };
+      query.date = date;
     }
 
     const entries = await DailyEntry.find(query)
@@ -69,6 +76,7 @@ router.post("/", async (req, res) => {
     const { date, customer, garlicQty, garlicRate } = req.body;
 
     const entry = await DailyEntry.create({
+      userId: req.user.userId,
       date,
       customer,
       garlicQty,
