@@ -242,11 +242,6 @@ const FiltersBar: FC<FiltersBarProps> = ({
 
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label>Date</Label>
-              <Input onChange={(e) => setDate(e.target.value)} type="date" value={date} />
-            </div>
-
-            <div className="space-y-2">
               <Label>Customer</Label>
               <Select onValueChange={setCustomerId} value={customerId}>
                 <SelectTrigger className="w-full">
@@ -261,7 +256,10 @@ const FiltersBar: FC<FiltersBarProps> = ({
                 </SelectContent>
               </Select>
             </div>
-
+            <div className="space-y-2">
+              <Label>Date</Label>
+              <Input onChange={(e) => setDate(e.target.value)} type="date" value={date} />
+            </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Garlic Qty (kg)</Label>
